@@ -49,11 +49,14 @@ If WebSocket isn't available, it can fall back to alternatives (like long-pollin
 
 ## Minimal example: broadcast a message
 
+These examples use **ES modules** (`import ...`).
+If you're running this with Node.js, either name files with `.mjs` (example: `server.mjs`) or set `"type": "module"` in `package.json`.
+
 ### 1) Install packages
 
 Server:
 ```bash
-pnpm add socket.io
+pnpm add express socket.io
 ```
 
 Client:
@@ -61,15 +64,21 @@ Client:
 pnpm add socket.io-client
 ```
 
-### 2) Server (`server.js`)
+### 2) Server (`server.js`) - Express + Socket.IO
 
 ```js
-const http = require("http");
-const { Server } = require("socket.io");
+import { createServer } from "http";
+import express from "express";
+import { Server } from "socket.io";
 
-const server = http.createServer();
+const app = express();
+const server = createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" }, // For learning only. Restrict in production.
+});
+
+app.get("/", (req, res) => {
+  res.send("Server is running. Open the client to connect to Socket.IO.");
 });
 
 io.on("connection", (socket) => {
@@ -99,7 +108,7 @@ server.listen(3000, () => {
 ### 3) Client (`client.js`)
 
 ```js
-const { io } = require("socket.io-client");
+import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3000");
 
